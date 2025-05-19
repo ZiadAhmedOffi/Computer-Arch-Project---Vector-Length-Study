@@ -15,6 +15,65 @@ This project investigates the **impact of vector length on the performance of a 
 - **Proxy Kernel (PK)**  
   Provides minimal OS functionality for bare-metal execution and interaction with the host during simulation.
 
+## Environment Setup for RISC-V Vector Architecture Project
+
+### Prerequisites
+
+- Ubuntu 20.04/22.04 (Recommended)
+- ~20GB disk space
+- GCC, Make, Autoconf, and other build essentials
+- Git
+
+Install build tools:
+```bash
+sudo apt update
+sudo apt install autoconf automake autotools-dev curl python3 libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake libglib2.0-dev
+```
+### 1. RISC-V GNU Toolchain (with V-extension support)
+Clone and build the toolchain with V-extension support:
+```bash
+git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
+cd riscv-gnu-toolchain
+
+# Configure with RVV support (0.7.1 is a stable vector spec version)
+./configure --prefix=/opt/riscv --with-arch=rv64gcv --with-abi=lp64d
+make -j$(nproc)
+```
+Then add to your `~/.bashrc`:
+```bash
+export PATH=/opt/riscv/bin:$PATH
+```
+To verify installation use the following command:
+```bash
+riscv64-unknown-elf-gcc --version
+```
+### 2.Spike RISC-V Simulator
+Build Spike with vector extension support:
+```bash
+git clone https://github.com/riscv-software-src/riscv-isa-sim
+cd riscv-isa-sim
+mkdir build
+cd build
+../configure --prefix=/opt/riscv --enable-vector
+make -j$(nproc)
+sudo make install
+```
+Verify installation:
+```bash
+spike --version
+```
+### 3. RISC-V Proxy Kernel (PK)
+Build the proxy kernel for Spike:
+```bash
+git clone https://github.com/riscv-software-src/riscv-pk
+cd riscv-pk
+mkdir build
+cd build
+../configure --prefix=/opt/riscv --host=riscv64-unknown-elf
+make -j$(nproc)
+sudo make install
+```
+Now the environment should be ready to run the code and object files in the repo.
 ## 🧪 Methodology
 
 1. Vector programs were written in C with vector intrinsics.
