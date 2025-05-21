@@ -1,23 +1,35 @@
-# 🧠 Vector Length and Performance in Vector Architecture
+# 🚀 Simulation of Vector Length and Performance in RISC-V Architecture
 
-## 📚 Project Overview
+A simulation project that models and analyzes **the impact of vector length on the performance of vector-based computation** within the RISC-V ecosystem. This project explores how varying vector lengths affect the performance of programs using RISC-V vector instructions.
 
-This project investigates the **impact of vector length on the performance of a vector architecture**, specifically within the RISC-V ecosystem. By varying the vector length and analyzing execution performance, the study aims to provide insights into the trade-offs and efficiency of vector-based computation.
+---
 
-## 🔧 Tools and Technologies Used
+## 📚 Table of Contents
 
-- **RISC-V GNU Toolchain**  
-  Used to compile vector-enabled C programs targeting the RISC-V architecture.
+- [💡 Acknowledgments](#-acknowledgments)
+- [🔍 Problem Description](#-problem-description)
+- [🧰 Prerequisites](#-prerequisites)
+- [🖥️ Environment Setup](#-environment-setup)
+- [✏️ Simulation Code Implementation](#-simulation-code-implementation)
+- [🏁 Compile and Run](#-compile-and-run)
+- [🧪 Testing and Validation](#-testing-and-validation)
+- [🧩 Challenges Encountered](#-challenges-encountered)
+- [🛠️ Handling Challenges](#-handling-challenges)
+- [📝 Conclusion](#-conclusion)
+- [📌 References](#-references)
+- [👥 Contributors](#-contributors)
 
-- **Spike RISC-V Simulator**  
-  A functional simulator for RISC-V ISA, used to run and test vector programs.
+---
 
-- **Proxy Kernel (PK)**  
-  Provides minimal OS functionality for bare-metal execution and interaction with the host during simulation.
+## 💡 Acknowledgments
 
-## Environment Setup for RISC-V Vector Architecture Project
+- Supervised by *Professor Mai Mohamed* at *Benha University - Shoubra College of Engineering*.
 
-### Prerequisites
+## 🔍 Problem Description
+
+This project investigates the performance impact of varying vector lengths in the RISC-V vector architecture. By compiling and simulating C programs that use vector instructions, we assess how vector configuration influences execution efficiency.
+
+## 🧰 Prerequisites
 
 - Ubuntu 20.04/22.04 (Recommended)
 - ~20GB disk space
@@ -25,94 +37,97 @@ This project investigates the **impact of vector length on the performance of a 
 - Git
 
 Install build tools:
+
 ```bash
 sudo apt update
 sudo apt install autoconf automake autotools-dev curl python3 libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake libglib2.0-dev
 ```
+
+## 🖥️ Environment Setup
+
 ### 1. RISC-V GNU Toolchain (with V-extension support)
-Clone and build the toolchain with V-extension support:
+
 ```bash
 git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
 cd riscv-gnu-toolchain
-
-# Configure with RVV support (0.7.1 is a stable vector spec version)
 ./configure --prefix=/opt/riscv --with-arch=rv64gcv --with-abi=lp64d
 make -j$(nproc)
+echo 'export PATH=/opt/riscv/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
 ```
-Then add to your `~/.bashrc`:
-```bash
-export PATH=/opt/riscv/bin:$PATH
-```
-To verify installation use the following command:
-```bash
-riscv64-unknown-elf-gcc --version
-```
-### 2.Spike RISC-V Simulator
-Build Spike with vector extension support:
+
+### 2. Spike RISC-V Simulator
+
 ```bash
 git clone https://github.com/riscv-software-src/riscv-isa-sim
 cd riscv-isa-sim
-mkdir build
-cd build
+mkdir build && cd build
 ../configure --prefix=/opt/riscv --enable-vector
 make -j$(nproc)
 sudo make install
 ```
-Verify installation:
-```bash
-spike --version
-```
+
 ### 3. RISC-V Proxy Kernel (PK)
-Build the proxy kernel for Spike:
+
 ```bash
 git clone https://github.com/riscv-software-src/riscv-pk
 cd riscv-pk
-mkdir build
-cd build
+mkdir build && cd build
 ../configure --prefix=/opt/riscv --host=riscv64-unknown-elf
 make -j$(nproc)
 sudo make install
 ```
-Now the environment should be ready to run the code and object files in the repo.
-## 🧪 Methodology
 
-1. Vector programs were written in C with vector intrinsics.
-2. Multiple configurations with varying vector lengths were compiled using the RISC-V GNU Toolchain.
-3. The compiled binaries were executed using the Spike simulator with Proxy Kernel support.
-4. Performance data (e.g., cycle counts, instruction counts) was collected and compared across different vector lengths.
+## ✏️ Simulation Code Implementation
 
-## 📈 Goals
+The main simulation code is written in C using RISC-V vector intrinsics. It varies vector lengths and measures corresponding performance metrics.
 
-- Measure performance trends across different vector lengths.
-- Understand the scalability of vector instructions in RISC-V.
-- Analyze architectural behavior in response to vector configuration changes.
+## 🏁 Compile and Run
 
-## 👨‍💻 Contributors
+Compile:
 
-- *Ahmed Osama Ibrahim*  
-- *Moamen Mohamed Ahmed*  
-- *Youseff Taha Saad*
-- *Zeyad Hashem Mohamed*
-- *Ziad Ahmed Mohamed*
+```bash
+riscv64-unknown-elf-gcc -march=rv64gcv -mabi=lp64 -o VectorTest VectorTest.c
+```
 
-## 🧑‍🏫 Supervisor
+Run:
 
-- *Proffessor Mai Mohamed*
+```bash
+spike --isa=rv64gcv /opt/riscv/bin/pk VectorTest
+```
 
-## Organization
+## 🧪 Testing and Validation
 
-- *Benha University - Shoubra College of Engineering*
+- Programs were compiled for various vector lengths.
+- Execution was tested with Spike simulator.
+- Performance metrics such as cycle counts and instruction counts were recorded and compared.
 
-## 📂 Repository Contents
+## 🧩 Challenges Encountered
 
-- Report – Complete report for the project  
-- VectorTest.c – Source code file (C Programming Language)
-- VectorTest – Resulting object file from the comopilation process
+- Ensuring compatibility across various vector lengths.
+- Configuring toolchain and simulator for vector extension.
+- Limited documentation on specific vector behaviors.
 
-## Build Instructions
+## 🛠️ Handling Challenges
 
-- Command used for  compilation is: `riscv64-unknown-elf-gcc -march=rv64gcv -mabi=lp64 -o OutputFile VectorTest.c`
-- Command used to run the object file on the Spike simulator is: `spike --isa=rv64gcv /your/path/to/pk VectorTest`
+- Referred to RISC-V vector specification v0.7.1 and GitHub issues.
+- Manually traced instruction behavior through Spike logs.
+- Incrementally built environment to isolate tool-specific errors.
 
----
+## 📝 Conclusion
 
+The experiment demonstrated clear correlations between vector length and program execution efficiency. Longer vector lengths generally improve performance up to hardware limits, but not without trade-offs.
+
+## 📌 References
+
+- RISC-V Vector Extension Spec v0.7.1
+- RISC-V GNU Toolchain Documentation
+- Spike ISA Simulator GitHub Repo
+
+## 👥 Contributors
+
+- Ahmed Osama Ibrahim
+- Moamen Mohamed Ahmed
+- Youseff Taha Saad
+- Zeyad Hashem Mohamed
+- Ziad Ahmed Mohamed
